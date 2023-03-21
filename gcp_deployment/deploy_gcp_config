@@ -30,6 +30,6 @@ vm_name="${VM_NAME:-icast-vm-1}"
 # VPC firewall rule name
 rule_name="allow-icast-webui-port-5000"
 # branch name to be checked out
-branch="${BRANCH:-master}"
+branch="${BRANCH:-deployment_testing}"
 # path to local copy of index files
 index_files_path="${INDEX_FILES_PATH:-../shared/indexes}"

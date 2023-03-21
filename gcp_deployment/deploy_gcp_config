@@ -1,0 +1,35 @@
+# Interactive-CAsT Google Cloud deployment parameters
+# 
+# This file is parsed by deploy_gcp.sh to obtain default
+# values for all the parameters. You can override any of
+# them by running the script with the appropriate environment
+# variable set, e.g.
+#    > VM_NAME=foobar ./deploy_gcp.sh create
+# to override the value of vm_name below.
+
+# compute region for the deployment, e.g. europe-west2. Different zones may have different
+# costs associated with them!
+region="${REGION:-europe-west2}"
+# compute zone for the deployment (this should be a zone within the above region, e.g. europe-west2-a)
+zone="${ZONE:-europe-west2-a}"
+# the names of the services that are required for the deployment:
+# - Compute Engine API
+declare -a required_services=( compute.googleapis.com )
+# machine-type value for the GCP VM.
+# These are described at https://cloud.google.com/compute/docs/machine-types
+# Default is e2-standard-4 (4 cores, 16GB)
+machine_type="${MACHINE_TYPE:-e2-standard-4}"
+# OS image for the VM. Defaults to Ubuntu 22.04
+os_image="${OS_IAMGE:-projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20230302}"
+# Boot disk size (in gigabytes) for the cluster nodes. 
+# Increasing this will increase costs! 50GB is enough, but gcloud warns that a disk
+# under 200GB might be slower so use that as the default for now
+boot_disk_size="${BOOT_DISK_SIZE:-200GB}"
+# the name for the VM to create/use
+vm_name="${VM_NAME:-icast-vm-1}"
+# VPC firewall rule name
+rule_name="allow-icast-webui-port-5000"
+# branch name to be checked out
+branch="${BRANCH:-master}"
+# path to local copy of index files
+index_files_path="${INDEX_FILES_PATH:-../shared/indexes}"

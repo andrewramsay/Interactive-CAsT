@@ -1,4 +1,4 @@
-FROM python:slim
+FROM python:3.10.10-slim
 
 RUN pip3 install --upgrade pip
 

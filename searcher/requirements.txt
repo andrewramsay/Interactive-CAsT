@@ -3,3 +3,6 @@ pyserini
 grpcio
 grpcio_tools
 lxml
+faiss-cpu
+torch==2.0.0
+protobuf==3.19.0

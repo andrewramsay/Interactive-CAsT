@@ -1,5 +1,4 @@
-
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 LABEL Author="Paul Owoicho"
 
@@ -10,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget vim \
     software-properties-common \
     locales \
+    gnupg \
     unzip
 
 RUN locale-gen en_US.UTF-8

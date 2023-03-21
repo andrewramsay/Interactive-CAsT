@@ -1,3 +1,4 @@
 grpcio
 grpcio_tools
 flask
+protobuf==3.19.0

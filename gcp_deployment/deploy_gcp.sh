@@ -325,6 +325,7 @@ then
  
     # build the images and start the deployment
     echo_color "> Starting deployment...\n"
+    run_ssh_command "${vm_name}" "${zone}" "cd Interactive-CAsT && sudo docker compose run builder" "> Running builder..."
     run_ssh_command "${vm_name}" "${zone}" "cd Interactive-CAsT && sudo docker compose up -d --build" "> Running docker compose up..."
     echo_color "> Deployment completed!\n"
 

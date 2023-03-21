@@ -307,8 +307,8 @@ then
     run_ssh_command "${vm_name}" "${zone}" "git clone --recurse -b ${branch} --single-branch https://github.com/andrewramsay/Interactive-CAsT.git" "> Cloning repo on VM..."
     
     echo_color "> Copying index files to VM...\n"
-    run_ssh_command "${vm_name}" "${zone}" "mkdir -p ./shared/indexes" "> Creating index folder"
-    gcloud compute scp --zone "${zone}" --recurse --compress "${index_files_path}"/* "${vm_name}:./shared/indexes"
+    run_ssh_command "${vm_name}" "${zone}" "mkdir -p Interactive-CAsT/shared/indexes" "> Creating index folder"
+    gcloud compute scp --zone "${zone}" --recurse --compress "${index_files_path}"/* "${vm_name}:Interactive-CAsT/shared/indexes"
 
     # add a firewall rule if needed
     echo_color "> Setting up firewall\n"
@@ -322,7 +322,7 @@ then
  
     # build the images and start the deployment
     echo_color "> Starting deployment...\n"
-    run_ssh_command "${vm_name}" "${zone}" "sudo docker compose up -d --build" "> Running docker compose up..."
+    run_ssh_command "${vm_name}" "${zone}" "cd Interactive-CAsT && sudo docker compose up -d --build" "> Running docker compose up..."
     echo_color "> Deployment completed!\n"
 
     # for exit_handler, see above
@@ -330,7 +330,7 @@ then
 elif [[ "${1}" == "logs" ]]
 then
     echo_color "> Running 'docker compose logs' on VM ${vm_name}..."
-    run_ssh_command "${vm_name}" "${zone}" "sudo docker compose logs" ""
+    run_ssh_command "${vm_name}" "${zone}" "cd Interactive-CAsT && sudo docker compose logs" ""
 elif [[ "${1}" == "cmd" ]]
 then
     declare -ar cmd=("${@:2}")

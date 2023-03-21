@@ -11,10 +11,10 @@ class PyseriniSearcher(AbstractSearcher):
     def __init__(self):
 
         self.indexes = {
-            'ALL' : SimpleSearcher('../../shared/indexes/all'),
-            'KILT' : SimpleSearcher('../../shared/indexes/kilt'),
-            'MARCO' : SimpleSearcher('../../shared/indexes/marco'),
-            'WAPO' : SimpleSearcher('../../shared/indexes/wapo')
+            'ALL' : SimpleSearcher('/shared/indexes/all'),
+            # 'KILT' : SimpleSearcher('/shared/indexes/kilt'),
+            # 'MARCO' : SimpleSearcher('/shared/indexes/marco'),
+            # 'WAPO' : SimpleSearcher('/shared/indexes/wapo')
             #new indices go here
         }
 

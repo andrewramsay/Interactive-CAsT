@@ -310,6 +310,9 @@ then
     run_ssh_command "${vm_name}" "${zone}" "mkdir -p Interactive-CAsT/shared/indexes" "> Creating index folder"
     gcloud compute scp --zone "${zone}" --recurse --compress "${index_files_path}"/* "${vm_name}:Interactive-CAsT/shared/indexes"
 
+    # temporary fixes
+    gcloud compute scp --zone "${zone}" --recurse "./pygaggle_temp/*" "${vm_name}":Interactive-CAsT/reranker/rerankers/pygaggle/
+
     # add a firewall rule if needed
     echo_color "> Setting up firewall\n"
     if does_firewall_rule_exist "${rule_name}"

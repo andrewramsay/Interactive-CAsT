@@ -311,7 +311,8 @@ then
     gcloud compute scp --zone "${zone}" --recurse --compress "${index_files_path}"/* "${vm_name}:Interactive-CAsT/shared/indexes"
 
     # temporary fixes
-    gcloud compute scp --zone "${zone}" --recurse "./pygaggle_temp/*" "${vm_name}":Interactive-CAsT/reranker/rerankers/pygaggle/
+    gcloud compute scp --zone "${zone}" --recurse "${script_path}/pygaggle_temp/requirements.txt" "${vm_name}":Interactive-CAsT/reranker/rerankers/pygaggle/requirements.txt
+    gcloud compute scp --zone "${zone}" --recurse "${script_path}/pygaggle_temp/pygaggle/rerank/base.py" "${vm_name}":Interactive-CAsT/reranker/rerankers/pygaggle/pygaggle/rerank/base.py
 
     # add a firewall rule if needed
     echo_color "> Setting up firewall\n"

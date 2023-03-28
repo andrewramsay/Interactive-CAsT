@@ -59,10 +59,23 @@ services:
       - REWRITER_URL=rewriter:8000
       - RERANKER_URL=reranker:8000
     volumes:
-    - ./web_ui:/source
-    - ./shared:/shared
+      - ./web_ui:/source
+      - ./shared:/shared
     depends_on:
-      - reranker  common:
+      - reranker
+
+  offline:
+    container_name: offline
+    profiles: ["offline"]
+    build:
+      context: ./
+      dockerfile: offline/Dockerfile
+    volumes:
+      - ./shared:/shared
+    depends_on:
+      - builder
+
+  common:
     container_name: common
     build:
       context: ./

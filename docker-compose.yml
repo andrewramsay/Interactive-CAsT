@@ -53,7 +53,7 @@ services:
       context: ./
       dockerfile: web_ui/Dockerfile
     ports:
-      - "5000:5000"
+      - "6000:5000"
     environment:
       - SEARCHER_URL=searcher:8000
       - REWRITER_URL=rewriter:8000

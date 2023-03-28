@@ -1,4 +1,0 @@
-grpcio
-grpcio_tools
-protobuf==3.19.0
-faiss-cpu

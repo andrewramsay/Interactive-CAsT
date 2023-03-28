@@ -1,6 +1,2 @@
-transformers
-torch
-sentencepiece
-grpcio
-grpcio_tools
-protobuf==3.19.0
+transformers==4.27.2
+sentencepiece==0.1.97

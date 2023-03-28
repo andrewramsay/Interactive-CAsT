@@ -1,39 +1,12 @@
-FROM ubuntu:22.04
+# syntax=docker/dockerfile:1.3
+FROM common:latest
 
 LABEL Author="Paul Owoicho"
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    build-essential \
-    git \
-    wget vim \
-    software-properties-common \
-    locales \
-    gnupg \
-    unzip
-
-RUN locale-gen en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-
-RUN add-apt-repository -y ppa:deadsnakes/ppa
-
-RUN apt-get install -y python3 \
-    python3-pip \
-    python-setuptools
-
-RUN pip3 install --upgrade pip
-
-RUN apt-get install -y openjdk-11-jdk
-
-# Install Rust for M1 Compatibility
-RUN apt-get install -y curl
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-
 COPY searcher/requirements.txt /source/requirements.txt
 
-RUN pip3 install -r source/requirements.txt
+RUN --mount=type=cache,mode=0755,target=/root/.cache/pip \
+    pip3 install -r source/requirements.txt
 
 COPY searcher/ /source
 

@@ -81,6 +81,8 @@ def search():
         search_query.search_parameters.collection = 2
     elif args["collection"] == "WAPO":
         search_query.search_parameters.collection = 3
+    elif args["collection"] == "CLUEWEB":
+        search_query.search_parameters.collection = 4
 
     start_time = time.time()
     search_result = search_client.search(search_query)

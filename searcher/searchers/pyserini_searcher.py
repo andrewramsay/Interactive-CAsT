@@ -1,5 +1,7 @@
+import os
+
 from .abstract_searcher import AbstractSearcher
-from pyserini.search import SimpleSearcher
+from pyserini.search import LuceneSearcher
 from searcher_pb2 import SearchQuery, DocumentQuery
 from search_result_pb2 import SearchResult, Document, Passage
 
@@ -10,18 +12,26 @@ class PyseriniSearcher(AbstractSearcher):
 
     def __init__(self):
 
-        self.indexes = {
-            'ALL' : SimpleSearcher('/shared/indexes/all'),
-            # 'KILT' : SimpleSearcher('/shared/indexes/kilt'),
-            # 'MARCO' : SimpleSearcher('/shared/indexes/marco'),
-            # 'WAPO' : SimpleSearcher('/shared/indexes/wapo')
-            #new indices go here
+        self.index_paths = {
+            'ALL' : '/shared/indexes/all',
+            'KILT' : '/shared/indexes/kilt',
+            'MARCO' : '/shared/indexes/marco',
+            'WAPO' : '/shared/indexes/wapo',
+            'CLUEWEB' : '/shared/indexes/clueweb'
+            # new indices go here
         }
+
+        self.indexes = {}
+        for name, path in self.index_paths.items():
+            if not os.path.exists(path):
+                print(f'WARNING: Not using index {name} because {path} does not exist')
+                continue
+
+            self.indexes[name] = LuceneSearcher(path)
 
         self.chosen_searcher = None
     
     def search(self, search_query: SearchQuery, context):
-
 
         query: str = search_query.query
         num_hits: int = search_query.num_hits

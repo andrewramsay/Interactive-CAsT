@@ -7,6 +7,7 @@ message SearchParameters {
         KILT = 1;
         MARCO = 2;
         WAPO = 3;
+        CLUEWEB = 4;
     }
     Collection collection = 1;
     map <string, string> parameters = 2; // other query parameters that may come up

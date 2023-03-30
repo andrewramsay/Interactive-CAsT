@@ -48,7 +48,7 @@ class PyseriniSearcher(AbstractSearcher):
         if search_query.search_parameters.collection == 3:
             self.chosen_searcher = self.indexes['WAPO']
 
-        if search_query.query.search_parameters.collection == 4:
+        if search_query.search_parameters.collection == 4:
             self.chosen_searcher = self.indexes['CLUEWEB']
         
         bm25_b = search_query.search_parameters.parameters["b"]

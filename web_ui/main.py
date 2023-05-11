@@ -73,16 +73,8 @@ def search():
     if args["backend"] == "Pyserini":
         search_query.search_backend = 0
     
-    if args["collection"] == "ALL":
-        search_query.search_parameters.collection = 0
-    elif args["collection"] == "KILT":
-        search_query.search_parameters.collection = 1
-    elif args["collection"] == "MARCO":
-        search_query.search_parameters.collection = 2
-    elif args["collection"] == "WAPO":
-        search_query.search_parameters.collection = 3
-    elif args["collection"] == "CLUEWEB":
-        search_query.search_parameters.collection = 4
+    # only ClueWeb in this version
+    search_query.search_parameters.collection = 4
 
     start_time = time.time()
     search_result = search_client.search(search_query)

@@ -13,10 +13,6 @@ class PyseriniSearcher(AbstractSearcher):
     def __init__(self):
 
         self.index_paths = {
-            'ALL' : '/shared/indexes/all',
-            'KILT' : '/shared/indexes/kilt',
-            'MARCO' : '/shared/indexes/marco',
-            'WAPO' : '/shared/indexes/wapo',
             'CLUEWEB' : '/shared/indexes/clueweb'
             # new indices go here
         }
@@ -36,20 +32,8 @@ class PyseriniSearcher(AbstractSearcher):
         query: str = search_query.query
         num_hits: int = search_query.num_hits
 
-        if search_query.search_parameters.collection == 0:
-            self.chosen_searcher = self.indexes['ALL']
-        
-        if search_query.search_parameters.collection == 1:
-            self.chosen_searcher = self.indexes['KILT']
-        
-        if search_query.search_parameters.collection == 2:
-            self.chosen_searcher = self.indexes['MARCO']
-        
-        if search_query.search_parameters.collection == 3:
-            self.chosen_searcher = self.indexes['WAPO']
-
-        if search_query.search_parameters.collection == 4:
-            self.chosen_searcher = self.indexes['CLUEWEB']
+        # only ClueWeb in this version
+        self.chosen_searcher = self.indexes['CLUEWEB']
         
         bm25_b = search_query.search_parameters.parameters["b"]
         bm25_k1 = search_query.search_parameters.parameters["k1"]
@@ -70,9 +54,8 @@ class PyseriniSearcher(AbstractSearcher):
 
         document_id = document_query.document_id
         
-        index = document_id.split("_")[0].strip()
-
-        self.chosen_searcher = self.indexes[index]
+        # only ClueWeb in this version
+        self.chosen_searcher = self.indexes['CLUEWEB']
 
         hit = self.chosen_searcher.doc(document_id)
 

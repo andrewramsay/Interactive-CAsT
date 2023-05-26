@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
+from markupsafe import Markup
 import os
+import re
 
 import time
 import json
@@ -87,6 +89,17 @@ def search():
         for document in search_result.documents:
             converted_document = MessageToDict(document)
             converted_document['passages'] = converted_document['passages'][:passage_limit]
+            # split() with no args = split on whitespace
+            for passage in converted_document['passages']:
+                for query_term in args["query"].split():
+                    # this encloses all case-insensitive matches of query_term in <strong> tags to
+                    # highlight them in the passage
+                    passage['body'] = re.sub(f'({query_term})', f'<strong>\\1</strong>', passage['body'], flags=re.IGNORECASE)
+
+                # replace the original string content of the passage body with a Markup object, which 
+                # allows the HTML to be parsed as expected instead of being escaped
+                passage['body'] = Markup(passage['body'])
+                
             documents.append(converted_document)
         
         end_time = time.time()
@@ -107,6 +120,7 @@ def search():
     for document in rerank_result.documents:
         converted_document = MessageToDict(document)
         converted_document['passages'] = converted_document['passages'][:passage_limit]
+
         documents.append(converted_document)
         
     end_time = time.time()

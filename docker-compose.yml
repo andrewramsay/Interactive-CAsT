@@ -1,5 +1,4 @@
 version: "3.9"
-
 services:
   builder:
     container_name: builder
@@ -9,7 +8,6 @@ services:
     volumes:
       - ./builder:/source
       - ./shared:/shared
-
   reranker:
     container_name: reranker
     build:
@@ -22,7 +20,13 @@ services:
       - builder
       - searcher
       - common
-
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
   rewriter:
     container_name: rewriter
     build:
@@ -34,7 +38,13 @@ services:
     depends_on:
       - builder
       - common
-
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
   searcher:
     container_name: searcher
     build:
@@ -46,7 +56,13 @@ services:
     depends_on:
       - builder
       - common
-
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
   web_ui:
     container_name: web_ui
     build:
@@ -63,7 +79,7 @@ services:
       - ./shared:/shared
     depends_on:
       - reranker
-
+      - searcher
   offline:
     container_name: offline
     profiles: ["offline"]
@@ -74,7 +90,6 @@ services:
       - ./shared:/shared
     depends_on:
       - builder
-
   common:
     container_name: common
     build:

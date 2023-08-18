@@ -13,7 +13,8 @@ class PyseriniSearcher(AbstractSearcher):
     def __init__(self):
 
         self.index_paths = {
-            'CLUEWEB' : '/shared/indexes/clueweb'
+            'CLUEWEB' : '/shared/indexes/clueweb',
+            'TRECiKAT2023' : '/shared/indexes/trec_ikat_2023'
             # new indices go here
         }
 
@@ -32,8 +33,12 @@ class PyseriniSearcher(AbstractSearcher):
         query: str = search_query.query
         num_hits: int = search_query.num_hits
 
-        # only ClueWeb in this version
-        self.chosen_searcher = self.indexes['CLUEWEB']
+        if search_query.search_parameters.collection == 0:
+            self.chosen_searcher = self.indexes["CLUEWEB"]
+        elif search_query.search_parameters.collection == 1:
+            self.chosen_searcher = self.indexes["TRECiKAT2023"]
+        else:
+            pass # TODO
         
         bm25_b = search_query.search_parameters.parameters["b"]
         bm25_k1 = search_query.search_parameters.parameters["k1"]

@@ -75,8 +75,13 @@ def search():
     if args["backend"] == "Pyserini":
         search_query.search_backend = 0
     
-    # only ClueWeb in this version
-    search_query.search_parameters.collection = 4
+    # 0 = CLUEWEB, 1 = TREC iKAT 2023
+    if args["collection"] == "CLUEWEB":
+        search_query.search_parameters.collection = 0
+    elif args["collection"] == "TRECiKAT2023":
+        search_query.search_parameters.collection = 1
+    else:
+        pass # TODO
 
     start_time = time.time()
     search_result = search_client.search(search_query)

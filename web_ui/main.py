@@ -51,11 +51,11 @@ def rerank(rerank_request: RerankRequest, passage_limit: int, passage_count: int
 
 
 def search(
-    search_query: SearchQuery, skipRerank: bool, passage_count: int, passage_limit: int
+    search_query: SearchQuery, skip_rerank: bool, passage_count: int, passage_limit: int
 ):
     search_result = search_client.search(search_query)
 
-    if skipRerank:
+    if skip_rerank:
         documents = []
         for document in search_result.documents:
             converted_document = MessageToDict(document)
@@ -137,12 +137,12 @@ def search_webui():
     else:
         return "Invalid collection", 400
 
-    skipRerank = args["skipRerank"] == "true"
+    skip_rerank = args["skipRerank"] == "true"
     passage_count = int(args["passageCount"])
     passage_limit = int(args["passageLimit"])
 
     start_time = time.time()
-    documents = search(search_query, skipRerank, passage_count, passage_limit)
+    documents = search(search_query, skip_rerank, passage_count, passage_limit)
     end_time = time.time()
     duration = int(end_time - start_time)
 
@@ -216,9 +216,9 @@ def search_api() -> Response:
     passage_count = request_dict.get("passage_count", default=3, type=int)
     passage_limit = request_dict.get("passage_limit", default=20, type=int)
     # reranker= request_dict.get("reranker", default="T5", type=str)
-    skipRerank = request_dict.get("skipRerank", default=False, type=bool)
+    skip_rerank = request_dict.get("skip_rerank", default=False, type=bool)
 
-    documents = search(search_query, skipRerank, passage_count, passage_limit)
+    documents = search(search_query, skip_rerank, passage_count, passage_limit)
 
     return jsonify(documents)
 

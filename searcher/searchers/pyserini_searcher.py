@@ -13,17 +13,14 @@ class PyseriniSearcher(AbstractSearcher):
     def __init__(self):
 
         self.index_paths = {
-            'ALL' : '/shared/indexes/all',
-            'KILT' : '/shared/indexes/kilt',
-            'MARCO' : '/shared/indexes/marco',
-            'WAPO' : '/shared/indexes/wapo',
-            'CLUEWEB' : '/shared/indexes/clueweb'
+            'CLUEWEB' : '/shared/indexes/clueweb',
+            'TRECiKAT2023' : '/shared/indexes/trec_ikat_2023'
             # new indices go here
         }
 
         self.indexes = {}
         for name, path in self.index_paths.items():
-            if not os.path.exists(path):
+            if not os.path.exists(path) or len(os.listdir(path)) == 0:
                 print(f'WARNING: Not using index {name} because {path} does not exist')
                 continue
 
@@ -37,19 +34,11 @@ class PyseriniSearcher(AbstractSearcher):
         num_hits: int = search_query.num_hits
 
         if search_query.search_parameters.collection == 0:
-            self.chosen_searcher = self.indexes['ALL']
-        
-        if search_query.search_parameters.collection == 1:
-            self.chosen_searcher = self.indexes['KILT']
-        
-        if search_query.search_parameters.collection == 2:
-            self.chosen_searcher = self.indexes['MARCO']
-        
-        if search_query.search_parameters.collection == 3:
-            self.chosen_searcher = self.indexes['WAPO']
-
-        if search_query.search_parameters.collection == 4:
-            self.chosen_searcher = self.indexes['CLUEWEB']
+            self.chosen_searcher = self.indexes["CLUEWEB"]
+        elif search_query.search_parameters.collection == 1:
+            self.chosen_searcher = self.indexes["TRECiKAT2023"]
+        else:
+            pass # TODO
         
         bm25_b = search_query.search_parameters.parameters["b"]
         bm25_k1 = search_query.search_parameters.parameters["k1"]
@@ -70,9 +59,8 @@ class PyseriniSearcher(AbstractSearcher):
 
         document_id = document_query.document_id
         
-        index = document_id.split("_")[0].strip()
-
-        self.chosen_searcher = self.indexes[index]
+        # only ClueWeb in this version
+        self.chosen_searcher = self.indexes['CLUEWEB']
 
         hit = self.chosen_searcher.doc(document_id)
 

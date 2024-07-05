@@ -1,5 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify, Response
+from markupsafe import Markup
 import os
+import re
 
 import time
 import json
@@ -36,6 +38,52 @@ rerank_client = RerankerStub(reranker_channel)
 rewriter_channel = grpc.insecure_channel(os.environ['REWRITER_URL'])
 rewrite_client = RewriterStub(rewriter_channel)
 
+def rerank(rerank_request: RerankRequest, passage_limit: int, passage_count: int):
+    rerank_result = rerank_client.rerank(rerank_request)
+    
+    documents = []
+    for document in rerank_result.documents:
+        converted_document = MessageToDict(document)
+        converted_document['passages'] = converted_document['passages'][:passage_count]
+        documents.append(converted_document)
+
+    return documents
+
+def search(search_query: SearchQuery, skipRerank: bool, passage_count: int, passage_limit: int):
+    search_result = search_client.search(search_query)
+
+    if skipRerank:
+        documents = []
+        for document in search_result.documents:
+            converted_document = MessageToDict(document)
+            converted_document['passages'] = converted_document['passages'][:passage_count]
+            # split() with no args = split on whitespace
+            for passage in converted_document['passages']:
+                for query_term in search_query.query.split():
+                    # this encloses all case-insensitive matches of query_term in <strong> tags to
+                    # highlight them in the passage
+                    passage['body'] = re.sub(f'({query_term})', f'<strong>\\1</strong>', passage['body'], flags=re.IGNORECASE)
+
+                # replace the original string content of the passage body with a Markup object, which 
+                # allows the HTML to be parsed as expected instead of being escaped
+                passage['body'] = Markup(passage['body'])
+                
+            documents.append(converted_document)
+        
+        end_time = time.time()
+        duration = int(end_time - start_time)
+        
+        return documents
+    
+    rerank_request = RerankRequest()
+    rerank_request.search_query = search_query.query
+    rerank_request.num_passages = passage_limit
+    rerank_request.search_result.MergeFrom(search_result)
+
+    documents = rerank(rerank_request, passage_count, passage_limit)
+        
+    return documents
+
 @app.route('/')
 def display_homepage():
     return render_template("homepage.html")
@@ -58,10 +106,11 @@ def display_doc(id):
     return render_template("fulltext.html", doc = converted_document)
 
 
-
-@app.route('/search')
-def search():
-    
+@app.route('/search', methods=["GET"])
+def search_webui():
+    """
+    Handle search(+rerank) requests made through the web UI.
+    """
     args = request.args
 
     search_query = SearchQuery()
@@ -70,53 +119,22 @@ def search():
     search_query.search_parameters.parameters["b"] = args["b"]
     search_query.search_parameters.parameters["k1"] = args["k1"]
 
-    if args["backend"] == "Pyserini":
+    if args["backend"] == "pyserini":
         search_query.search_backend = 0
+    else:
+        return "Invalid search backend", 400
     
-    if args["collection"] == "ALL":
-        search_query.search_parameters.collection = 0
-    elif args["collection"] == "KILT":
+    if args["collection"] == "TRECiKAT2023":
         search_query.search_parameters.collection = 1
-    elif args["collection"] == "MARCO":
-        search_query.search_parameters.collection = 2
-    elif args["collection"] == "WAPO":
-        search_query.search_parameters.collection = 3
-    elif args["collection"] == "CLUEWEB":
-        search_query.search_parameters.collection = 4
+    else:
+        return "Invalid collection", 400
+
+    skipRerank = args["skipRerank"] == "true"
+    passage_count = int(args["passageCount"])
+    passage_limit = int(args["passageLimit"])
 
     start_time = time.time()
-    search_result = search_client.search(search_query)
-
-    passage_limit = int(args["passageCount"])
-
-    if args["skipRerank"] == "true":
-        
-        documents = []
-        for document in search_result.documents:
-            converted_document = MessageToDict(document)
-            converted_document['passages'] = converted_document['passages'][:passage_limit]
-            documents.append(converted_document)
-        
-        end_time = time.time()
-        duration = int(end_time - start_time)
-        
-        return render_template("results.html", docs = documents, 
-            numFound=len(documents), duration=duration, query=search_query.query)
-    
-    rerank_request = RerankRequest()
-    rerank_request.search_query = search_query.query
-
-    rerank_request.num_passages = int(args["passageLimit"])
-    rerank_request.search_result.MergeFrom(search_result)
-
-    rerank_result = rerank_client.rerank(rerank_request)
-    
-    documents = []
-    for document in rerank_result.documents:
-        converted_document = MessageToDict(document)
-        converted_document['passages'] = converted_document['passages'][:passage_limit]
-        documents.append(converted_document)
-        
+    documents = search(search_query, skipRerank, passage_count, passage_limit)
     end_time = time.time()
     duration = int(end_time - start_time)
         
@@ -153,7 +171,43 @@ def rewrite():
     }
 
 
+@app.route("/api/search", methods=["GET", "POST"])
+def search_api() -> Response:
+    """
+    API endpoint equivalent of running a search or search+rerank in the web UI.
+    """
+    request_dict = request.args if request.method == "GET" else request.form
 
+    search_query = SearchQuery()
+    query= request_dict.get("searchQuery", type=str)
+    if query is None or len(query) == 0:
+        return "Missing query string", 400
+
+    search_query.query = query.replace("_", " ")
+    search_query.num_hits = request_dict.get("numDocs", default=50, type=int)
+    search_query.search_parameters.parameters["b"] = request_dict.get("b", default="0.8", type=str)
+    search_query.search_parameters.parameters["k1"] = request_dict.get("k1", default="4.4", type=str)
+
+    backend = request_dict.get("backend", default="pyserini", type=str)
+    if backend == "pyserini":
+        search_query.search_backend = 0
+    else:
+        return "Invalid search backend", 400
+
+    collection= request_dict.get("collection", default="TRECiKAT2023", type=str)
+    if collection == "TRECiKAT2023":
+        search_query.search_parameters.collection = 1
+    else:
+        return "Invalid collection", 400
+
+    passage_count= request_dict.get("passage_count", default=3, type=int)
+    passage_limit = request_dict.get("passage_limit", default=20, type=int)
+    #reranker= request_dict.get("reranker", default="T5", type=str)
+    skipRerank = request_dict.get("skipRerank", default=False, type=bool)
+
+    documents = search(search_query, skipRerank, passage_count, passage_limit)
+
+    return jsonify(documents)
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))

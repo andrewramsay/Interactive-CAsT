@@ -80,9 +80,6 @@ def search(
 
             documents.append(converted_document)
 
-        end_time = time.time()
-        duration = int(end_time - start_time)
-
         return documents
 
     rerank_request = RerankRequest()

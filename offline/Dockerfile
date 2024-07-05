@@ -22,6 +22,7 @@ RUN apt-get install -y python3 \
     python3-pip \
     python-setuptools
 
+RUN apt-get remove -y python3-blinker
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade flask requests
 

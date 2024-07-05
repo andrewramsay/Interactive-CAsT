@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/jpg" href="{{ url_for('static', filename='fav_icon.png') }}"/>
-    <title>CAsT Search</title>
+    <title>iKAT Searcher</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
@@ -16,11 +16,8 @@
         <img src="{{ url_for('static', filename='logo.png') }}" id="logo_hero" /><br />
         <input type="text" class="searchbar" id="searchbar_hero" />
         <select name="collection" id="collection">
-            <option value="ALL">ALL</option>
-            <!-- <option value="KILT">KILT</option> -->
-            <!-- <option value="WAPO">WAPO</option> -->
-            <option value="MARCO">MARCO</option>
-            <option value="CLUEWEB">CLUEWEB</option>
+		<option value="CLUEWEB" disabled>CLUEWEB</option>
+            <option value="TRECiKAT2023">TREC iKAT 2023</option>
             <!-- Add new indices here -->
         </select>
         <select name="search_backend" id="search_backend">
@@ -33,7 +30,7 @@
             <option value="BERT">BERT</option>
             <!-- Add new rerankers here -->
         </select>
-        <input type="checkbox" id="skip_rerank" name="use_titles" checked>
+        <input type="checkbox" id="skip_rerank" name="use_titles">
         <label for="skip_rerank">Skip Rerank</label>
 
 
@@ -67,7 +64,7 @@
         </select>
     </div>
 
-    <div class="footer"><a href="http://www.treccast.ai">TREC CAsT</a> &bull; 2021</div>
+    <div class="footer"><a href="http://www.trecikat.com">TREC iKAT</a> &bull; 2023</div>
 
 </body>
 

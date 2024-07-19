@@ -69,7 +69,7 @@ def search(
                     # highlight them in the passage
                     passage["body"] = re.sub(
                         f"({query_term})",
-                        f"<strong>\\1</strong>",
+                        "<strong>\\1</strong>",
                         passage["body"],
                         flags=re.IGNORECASE,
                     )

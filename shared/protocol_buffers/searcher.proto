@@ -3,11 +3,8 @@ import "search_result.proto";
 
 message SearchParameters {
     enum Collection {
-        ALL = 0;
-        KILT = 1;
-        MARCO = 2;
-        WAPO = 3;
-        CLUEWEB = 4;
+        CLUEWEB = 0;
+        TRECIKAT2023 = 1;
     }
     Collection collection = 1;
     map <string, string> parameters = 2; // other query parameters that may come up
@@ -27,6 +24,12 @@ message DocumentQuery {
     SearchBackend search_backend = 2;
 }
 
+message FulltextQuery {
+    string document_id = 1;
+    SearchBackend search_backend = 2;
+    int32 passage_id = 3; // optional
+}
+
 enum SearchBackend {
     PYSERINI = 0;
 }
@@ -35,4 +38,5 @@ enum SearchBackend {
 service Searcher {
     rpc search(SearchQuery) returns (SearchResult) {}
     rpc get_document(DocumentQuery) returns (Document) {}
+    rpc get_fulltext(FulltextQuery) returns (Fulltext) {}
 }

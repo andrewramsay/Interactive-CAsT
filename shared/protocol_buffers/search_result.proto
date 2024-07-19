@@ -17,6 +17,13 @@ message Document {
     float score = 5; //score given after first pass retrieval
 }
 
+message Fulltext {
+    string id = 1;
+    string url = 2;
+    string title = 3;
+    string body = 4;
+}
+
 //multiple documents make up a search result, first pass retrieval
 message SearchResult {
     google.protobuf.Timestamp time_taken = 1; //how long the search took

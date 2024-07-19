@@ -1,0 +1,30 @@
+[tool.black]
+max-line-length = 125
+[tool.ruff]
+select = ["E", "F", "B"]
+ignore = ["F401"]
+line-length = 125
+src = [".", "shared", "shared/compiled_protobufs"]
+[tool.ruff.isort]
+split-on-trailing-comma = true
+known-first-party = [ "asr_info_pb2","asr_info_pb2_grpc", "asr_parser_pb2","asr_parser_pb2_grpc", "dangerous_task_pb2","dangerous_task_pb2_grpc", "database_pb2","database_pb2_grpc", "DIY_document_pb2","DIY_document_pb2_grpc", "document_pb2","document_pb2_grpc", "image_searcher_pb2","image_searcher_pb2_grpc", "intent_classifier_pb2","intent_classifier_pb2_grpc", "mappings_pb2","mappings_pb2_grpc", "mlm_scoring_pb2","mlm_scoring_pb2_grpc", "offline_pb2","offline_pb2_grpc", "overrides_pb2","overrides_pb2_grpc", "personality_pb2","personality_pb2_grpc", "phase_intent_classifier_pb2","phase_intent_classifier_pb2_grpc", "qa_pb2","qa_pb2_grpc", "qa_response_relevance_pb2","qa_response_relevance_pb2_grpc", "query_searcher_pb2","query_searcher_pb2_grpc", "recipe_document_pb2","recipe_document_pb2_grpc", "safety_pb2","safety_pb2_grpc", "searcher_pb2","searcher_pb2_grpc", "semantic_searcher_pb2","semantic_searcher_pb2_grpc", "staged_enhancer_pb2","staged_enhancer_pb2_grpc", "taskmad_pb2","taskmad_pb2_grpc", "task_manager_pb2","task_manager_pb2_grpc", "taskmap_pb2","taskmap_pb2_grpc", "theme_pb2","theme_pb2_grpc", "video_document_pb2","video_document_pb2_grpc", "video_searcher_pb2","video_searcher_pb2_grpc", "policy" ]
+
+[tool.pyright]
+stubPath = "./shared/compiled_protobufs"
+extraPaths = ["./shared", "./shared/compiled_protobufs"]
+typeCheckingMode = "basic"
+reportImportCycles = "information"
+reportUnusedImport = "none"
+reportUnusedVariable = "information"
+reportDuplicateImport = "information"
+reportWildcardImportFromLibrary = "warning"
+reportUntypedFunctionDecorator = "warning"
+reportPrivateUsagenformation = "warning"
+reportPrivateUsage = "warning"
+reportConstantRedefinition = "warning"
+reportIncompatibleMethodOverride = "warning"
+reportUnknownParameterType = "information"
+reportMissingParameterType = "information"
+reportUnnecessaryContains = "warning"
+reportUnnecessaryComparison = "warning"
+reportImplicitStringConcatenation = "none"

@@ -42,6 +42,9 @@ rewrite_client = RewriterStub(rewriter_channel)
 
 
 def rerank(rerank_request: RerankRequest, passage_limit: int, passage_count: int) -> list[dict[str, Any]]:
+    """
+    Submit a request to the reranker service and return a list of documents.
+    """
     rerank_result = rerank_client.rerank(rerank_request)
 
     documents = []
@@ -53,18 +56,17 @@ def rerank(rerank_request: RerankRequest, passage_limit: int, passage_count: int
     return documents
 
 
-def search(
-    search_query: SearchQuery, skip_rerank: bool, passage_count: int, passage_limit: int
-) -> list[dict[str, Any]]:
+def search(search_query: SearchQuery, skip_rerank: bool, passage_count: int, passage_limit: int) -> list[dict[str, Any]]:
+    """
+    Submit a request to the searcher service and return results.
+    """
     search_result: SearchResult = search_client.search(search_query)
 
     if skip_rerank:
         documents: list[dict] = []
         for document in search_result.documents:
             converted_document = MessageToDict(document)
-            converted_document["passages"] = converted_document["passages"][
-                :passage_count
-            ]
+            converted_document["passages"] = converted_document["passages"][:passage_count]
             # split() with no args = split on whitespace
             for passage in converted_document["passages"]:
                 for query_term in search_query.query.split():
@@ -97,13 +99,22 @@ def search(
 
 @app.route("/")
 def display_homepage() -> str:
+    """
+    Flask handler for displaying the homepage.
+    """
     return render_template("homepage.html")
 
 
 @app.route("/api/fulltext/<id>", defaults={"passage": ""})
 @app.route("/api/fulltext/<id>/<passage>")
 def fulltext(id: str, passage: str) -> str | Response:
-    """API endpoint alternative to display_doc below"""
+    """
+    API endpoint for retrieving fulltext of ClueWeb documents.
+
+    This supports two types of lookup:
+        - api/fulltext/<id> retrieves the whole document
+        - api/fulltext/<id>/<passage> retrieves a single passage from the document
+    """
     query = FulltextQuery()
 
     # pyserini is the only usable option here
@@ -121,8 +132,12 @@ def fulltext(id: str, passage: str) -> str | Response:
     fulltext = MessageToDict(fulltext)
     return jsonify(fulltext)
 
+
 @app.route("/<id>/fulltext")
 def display_doc(id: str) -> str:
+    """
+    Display document fulltext via HTML template.
+    """
     args = request.args
     document_query = DocumentQuery()
 
@@ -181,6 +196,11 @@ def search_webui() -> str | Response:
 
 @app.route("/rewrite", methods=["POST"])
 def rewrite() -> Response:
+    """
+    Submit a request to the rewriter service.
+
+    This handler is actually triggered by some Javascript in homepage.js.
+    """
     client_rewrite_request = request.get_data()
     client_rewrite_request = json.loads(client_rewrite_request)
 
@@ -218,12 +238,8 @@ def search_api() -> Response:
 
     search_query.query = query.replace("_", " ")
     search_query.num_hits = request_dict.get("numDocs", default=50, type=int)
-    search_query.search_parameters.parameters["b"] = request_dict.get(
-        "b", default="0.8", type=str
-    )
-    search_query.search_parameters.parameters["k1"] = request_dict.get(
-        "k1", default="4.4", type=str
-    )
+    search_query.search_parameters.parameters["b"] = request_dict.get("b", default="0.8", type=str)
+    search_query.search_parameters.parameters["k1"] = request_dict.get("k1", default="4.4", type=str)
 
     backend = request_dict.get("backend", default="pyserini", type=str)
     if backend == "pyserini":
